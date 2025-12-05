@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -38,6 +37,7 @@ const styles = StyleSheet.create({
     left: 20,
     top: 50,
     padding: 8,
+    zIndex: 1, // Added for better clickability
   },
   content: {
     flex: 1,
@@ -312,8 +312,9 @@ export default function RequestsScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
+        {/* Changed from "arrow-back" to "chevron.left" to match other screens */}
         <Pressable style={styles.backButton} onPress={() => router.back()}>
-          <IconSymbol name="arrow-back" size={24} color={barangayColors.white} />
+          <IconSymbol name="chevron.left" size={24} color={barangayColors.white} />
         </Pressable>
         <Text style={styles.headerTitle}>My Requests</Text>
       </View>
@@ -341,7 +342,8 @@ export default function RequestsScreen() {
 
         {filteredRequests.length === 0 ? (
           <View style={styles.emptyState}>
-            <IconSymbol name="description" size={64} color={barangayColors.textLight} />
+            {/* Optional: Update empty state icon to match SF Symbols */}
+            <IconSymbol name="doc.text" size={64} color={barangayColors.textLight} />
             <Text style={styles.emptyText}>
               {activeFilter === 'all' ? 'No requests found' : `No ${activeFilter} requests`}
             </Text>

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -13,8 +12,7 @@ import {
   Image,
 } from 'react-native';
 import { barangayColors } from '../../constants/Colors';
-import { IconSymbol } from '../../components/IconSymbol';
-import { Button } from '../../components/button';
+import { IconSymbol } from '../../components/IconSymbol'; // Keep IconSymbol
 import { router } from 'expo-router';
 import { useAuth } from '../../contexts/AuthContext';
 import { DocumentRequest, PaymentMethod } from '../../types';
@@ -43,6 +41,7 @@ const styles = StyleSheet.create({
     left: 20,
     top: 50,
     padding: 8,
+    zIndex: 1, // Added to ensure it's clickable
   },
   content: {
     flex: 1,
@@ -200,6 +199,21 @@ const styles = StyleSheet.create({
   },
 });
 
+// Helper function to map icon names for IconSymbol
+const getIconSymbolName = (iconName: string): string => {
+  const iconMap: Record<string, string> = {
+    'account-balance-wallet': 'creditcard.fill', // Using creditcard.fill as alternative
+    'credit-card': 'creditcard.fill',
+    'account-balance': 'building.columns.fill', // Bank icon
+    'store': 'storefront.fill',
+    'arrow-back': 'chevron.left', // Changed to match your other screen
+    'payment': 'creditcard.fill',
+    'cloud-upload': 'icloud.and.arrow.up.fill',
+  };
+  
+  return iconMap[iconName] || iconName;
+};
+
 export default function PaymentsScreen() {
   const { user } = useAuth();
   const [pendingPayments, setPendingPayments] = useState<DocumentRequest[]>([]);
@@ -336,18 +350,20 @@ export default function PaymentsScreen() {
     }
   };
 
+  // Use SF Symbols icon names (like your other screen)
   const paymentMethods = [
-    { id: 'gcash', name: 'GCash', icon: 'account-balance-wallet' },
-    { id: 'paymaya', name: 'PayMaya', icon: 'credit-card' },
-    { id: 'bank_transfer', name: 'Bank Transfer', icon: 'account-balance' },
-    { id: 'over_the_counter', name: 'Over the Counter', icon: 'store' },
+    { id: 'gcash', name: 'GCash', icon: 'creditcard.fill' },
+    { id: 'paymaya', name: 'PayMaya', icon: 'creditcard.fill' },
+    { id: 'bank_transfer', name: 'Bank Transfer', icon: 'building.columns.fill' },
+    { id: 'over_the_counter', name: 'Over the Counter', icon: 'storefront.fill' },
   ];
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Pressable style={styles.backButton} onPress={() => router.back()}>
-          <IconSymbol name="arrow-back" size={24} color={barangayColors.white} />
+          {/* Use the same icon as your other screen */}
+          <IconSymbol name="chevron.left" size={24} color={barangayColors.white} />
         </Pressable>
         <Text style={styles.headerTitle}>Payments</Text>
       </View>
@@ -355,7 +371,7 @@ export default function PaymentsScreen() {
       <ScrollView style={styles.content}>
         {pendingPayments.length === 0 ? (
           <View style={styles.emptyState}>
-            <IconSymbol name="payment" size={64} color={barangayColors.textLight} />
+            <IconSymbol name="creditcard.fill" size={64} color={barangayColors.textLight} />
             <Text style={styles.emptyText}>No pending payments</Text>
           </View>
         ) : (
@@ -416,7 +432,11 @@ export default function PaymentsScreen() {
                       ]}
                       onPress={() => handlePaymentMethodSelect(method.id as PaymentMethod)}
                     >
-                      <IconSymbol name={method.icon as any} size={24} color={barangayColors.primary} />
+                      <IconSymbol 
+                        name={method.icon as any} 
+                        size={24} 
+                        color={barangayColors.primary} 
+                      />
                       <Text style={styles.paymentMethodText}>{method.name}</Text>
                     </Pressable>
                   ))}
@@ -439,7 +459,7 @@ export default function PaymentsScreen() {
                       <Image source={{ uri: proofImage }} style={styles.proofImage} />
                     ) : (
                       <>
-                        <IconSymbol name="cloud-upload" size={48} color={barangayColors.textLight} />
+                        <IconSymbol name="icloud.and.arrow.up.fill" size={48} color={barangayColors.textLight} />
                         <Text style={styles.uploadText}>
                           Tap to upload screenshot or receipt
                         </Text>

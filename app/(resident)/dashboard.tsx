@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -6,10 +5,11 @@ import {
   ScrollView,
   Pressable,
   StyleSheet,
-  SafeAreaView,
   Dimensions,
   Alert,
   Linking,
+  StatusBar,
+  Platform,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
@@ -37,14 +37,12 @@ export default function ResidentDashboard() {
   }, []);
 
   const loadDashboardData = () => {
-    console.log('Loading dashboard data for resident:', user?.firstName);
-    
     const activeAnnouncements = getActiveAnnouncements();
-    setAnnouncements(activeAnnouncements.slice(0, 3)); // Show latest 3
+    setAnnouncements(activeAnnouncements.slice(0, 3));
     
     if (user?.id) {
       const userRequests = getDocumentRequestsByResident(user.id);
-      setRecentRequests(userRequests.slice(0, 2)); // Show latest 2
+      setRecentRequests(userRequests.slice(0, 2));
     }
     
     const contacts = getEmergencyContacts();
@@ -59,51 +57,19 @@ export default function ResidentDashboard() {
         { text: 'Cancel', style: 'cancel' },
         { 
           text: 'Call', 
-          onPress: () => {
-            Linking.openURL(`tel:${phoneNumber}`);
-          }
+          onPress: () => Linking.openURL(`tel:${phoneNumber}`)
         }
       ]
     );
   };
 
   const quickAccessItems = [
-    {
-      title: 'Request Documents',
-      icon: 'doc.text',
-      color: barangayColors.primary,
-      route: '/(resident)/documents',
-    },
-    {
-      title: 'Pay Online',
-      icon: 'creditcard',
-      color: barangayColors.success,
-      route: '/(resident)/payments',
-    },
-    {
-      title: 'My Requests',
-      icon: 'list.bullet',
-      color: barangayColors.accent,
-      route: '/(resident)/requests',
-    },
-    {
-      title: 'Directory',
-      icon: 'phone.circle',
-      color: barangayColors.secondary,
-      route: '/(resident)/directory',
-    },
-    {
-      title: 'Announcements',
-      icon: 'megaphone',
-      color: barangayColors.warning,
-      route: '/(resident)/announcements',
-    },
-    {
-      title: 'Profile',
-      icon: 'person.circle',
-      color: barangayColors.gray,
-      route: '/(resident)/profile',
-    },
+    { title: 'My Documents', icon: 'folder', color: barangayColors.primary, route: '/(resident)/mydocuments' },
+    { title: 'Request Documents', icon: 'doc.text', color: barangayColors.primary, route: '/(resident)/documents' },
+    { title: 'Pay Online', icon: 'creditcard', color: barangayColors.success, route: '/(resident)/payments' },
+    { title: 'My Requests', icon: 'list.bullet', color: barangayColors.accent, route: '/(resident)/requests' },
+    { title: 'Directory', icon: 'phone.circle', color: barangayColors.secondary, route: '/(resident)/directory' },
+    { title: 'Announcements', icon: 'megaphone', color: barangayColors.warning, route: '/(resident)/announcements' },
   ];
 
   const getStatusColor = (status: string) => {
@@ -126,7 +92,7 @@ export default function ResidentDashboard() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       {/* Header */}
       <LinearGradient
         colors={[barangayColors.primary, barangayColors.accent]}
@@ -138,13 +104,25 @@ export default function ResidentDashboard() {
             <Text style={styles.userName}>{user?.firstName} {user?.lastName}</Text>
             <Text style={styles.barangayName}>{mockAppSettings.barangayName}</Text>
           </View>
-          <Pressable onPress={logout} style={styles.logoutButton}>
-            <IconSymbol name="rectangle.portrait.and.arrow.right" color={barangayColors.white} size={24} />
-          </Pressable>
+
+          {/* SETTINGS + LOGOUT */}
+          <View style={styles.headerRight}>
+            <Pressable 
+              onPress={() => router.push('/(resident)/settings')} 
+              style={styles.headerIconButton}
+            >
+              <IconSymbol name="gear" color={barangayColors.white} size={24} />
+            </Pressable>
+
+            <Pressable onPress={logout} style={styles.headerIconButton}>
+              <IconSymbol name="rectangle.portrait.and.arrow.right" color={barangayColors.white} size={24} />
+            </Pressable>
+          </View>
         </View>
       </LinearGradient>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        
         {/* Emergency Contacts */}
         <View style={styles.emergencySection}>
           <Text style={styles.sectionTitle}>Emergency Contacts</Text>
@@ -162,7 +140,7 @@ export default function ResidentDashboard() {
           </ScrollView>
         </View>
 
-        {/* Announcements Carousel */}
+        {/* Announcements */}
         {announcements.length > 0 && (
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
@@ -235,17 +213,14 @@ export default function ResidentDashboard() {
           </View>
         )}
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: barangayColors.background,
-  },
+  container: { flex: 1, backgroundColor: barangayColors.background },
   header: {
-    paddingTop: 20,
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
     paddingBottom: 30,
     paddingHorizontal: 20,
   },
@@ -254,40 +229,21 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'flex-start',
   },
-  headerLeft: {
-    flex: 1,
+  headerLeft: { flex: 1 },
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
   },
-  greeting: {
-    fontSize: 16,
-    color: barangayColors.white,
-    opacity: 0.9,
-  },
-  userName: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: barangayColors.white,
-    marginTop: 4,
-  },
-  barangayName: {
-    fontSize: 14,
-    color: barangayColors.white,
-    opacity: 0.8,
-    marginTop: 2,
-  },
-  logoutButton: {
+  headerIconButton: {
     padding: 8,
   },
-  content: {
-    flex: 1,
-    paddingHorizontal: 20,
-  },
-  emergencySection: {
-    marginTop: 20,
-    marginBottom: 10,
-  },
-  emergencyScroll: {
-    marginTop: 10,
-  },
+  greeting: { fontSize: 16, color: barangayColors.white, opacity: 0.9 },
+  userName: { fontSize: 24, fontWeight: 'bold', color: barangayColors.white, marginTop: 4 },
+  barangayName: { fontSize: 14, color: barangayColors.white, opacity: 0.8, marginTop: 2 },
+  content: { flex: 1, paddingHorizontal: 20 },
+  emergencySection: { marginTop: 20, marginBottom: 10 },
+  emergencyScroll: { marginTop: 10 },
   emergencyCard: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -297,34 +253,17 @@ const styles = StyleSheet.create({
     marginRight: 12,
     minWidth: 120,
   },
-  emergencyText: {
-    color: barangayColors.white,
-    fontSize: 12,
-    fontWeight: '600',
-    marginLeft: 8,
-  },
-  section: {
-    marginVertical: 15,
-  },
+  emergencyText: { color: barangayColors.white, fontSize: 12, fontWeight: '600', marginLeft: 8 },
+  section: { marginVertical: 15 },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 15,
   },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: barangayColors.text,
-  },
-  seeAllText: {
-    fontSize: 14,
-    color: barangayColors.primary,
-    fontWeight: '600',
-  },
-  announcementScroll: {
-    marginTop: 10,
-  },
+  sectionTitle: { fontSize: 20, fontWeight: 'bold', color: barangayColors.text },
+  seeAllText: { fontSize: 14, color: barangayColors.primary, fontWeight: '600' },
+  announcementScroll: { marginTop: 10 },
   announcementCard: {
     backgroundColor: barangayColors.white,
     borderRadius: 12,
@@ -344,32 +283,11 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginBottom: 8,
   },
-  priorityText: {
-    fontSize: 10,
-    fontWeight: 'bold',
-    color: barangayColors.white,
-  },
-  announcementTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: barangayColors.text,
-    marginBottom: 8,
-  },
-  announcementContent: {
-    fontSize: 14,
-    color: barangayColors.textLight,
-    lineHeight: 20,
-    marginBottom: 8,
-  },
-  announcementDate: {
-    fontSize: 12,
-    color: barangayColors.gray,
-  },
-  quickAccessGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
+  priorityText: { fontSize: 10, fontWeight: 'bold', color: barangayColors.white },
+  announcementTitle: { fontSize: 16, fontWeight: 'bold', color: barangayColors.text, marginBottom: 8 },
+  announcementContent: { fontSize: 14, color: barangayColors.textLight, lineHeight: 20, marginBottom: 8 },
+  announcementDate: { fontSize: 12, color: barangayColors.gray },
+  quickAccessGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
   quickAccessItem: {
     width: '48%',
     backgroundColor: barangayColors.white,
@@ -391,12 +309,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 12,
   },
-  quickAccessText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: barangayColors.text,
-    textAlign: 'center',
-  },
+  quickAccessText: { fontSize: 14, fontWeight: '600', color: barangayColors.text, textAlign: 'center' },
   requestCard: {
     backgroundColor: barangayColors.white,
     borderRadius: 12,
@@ -414,28 +327,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 8,
   },
-  requestType: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: barangayColors.text,
-  },
-  statusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  statusText: {
-    fontSize: 10,
-    fontWeight: 'bold',
-    color: barangayColors.white,
-  },
-  requestPurpose: {
-    fontSize: 14,
-    color: barangayColors.textLight,
-    marginBottom: 4,
-  },
-  requestDate: {
-    fontSize: 12,
-    color: barangayColors.gray,
-  },
+  requestType: { fontSize: 16, fontWeight: 'bold', color: barangayColors.text },
+  statusBadge: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 12 },
+  statusText: { fontSize: 10, fontWeight: 'bold', color: barangayColors.white },
+  requestPurpose: { fontSize: 14, color: barangayColors.textLight, marginBottom: 4 },
+  requestDate: { fontSize: 12, color: barangayColors.gray },
 });

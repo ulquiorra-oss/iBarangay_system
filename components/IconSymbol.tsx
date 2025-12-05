@@ -1,23 +1,13 @@
-// This file is a fallback for using MaterialIcons on Android and web.
-
+// IconSymbol.tsx
 import React from "react";
-import { SymbolWeight } from "expo-symbols";
-import {
-  OpaqueColorValue,
-  StyleProp,
-  TextStyle,
-  ViewStyle,
-} from "react-native";
+import { OpaqueColorValue, StyleProp, TextStyle } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
-// Add your SFSymbol to MaterialIcons mappings here.
-const MAPPING = {
-  // See MaterialIcons here: https://icons.expo.fyi
-  // See SF Symbols in the SF Symbols app on Mac.
-
+// Simple mapping without complex types
+const MAPPING: Record<string, React.ComponentProps<typeof MaterialIcons>["name"]> = {
   // Navigation & Home
   "house.fill": "home",
-  "house": "home-outlined",
+  "house": "home",
   "arrow.left": "arrow-back",
   "arrow.right": "arrow-forward",
   "arrow.up": "arrow-upward",
@@ -31,13 +21,13 @@ const MAPPING = {
 
   // Communication & Social
   "paperplane.fill": "send",
-  "paperplane": "send-outlined",
+  "paperplane": "send",
   "envelope.fill": "mail",
-  "envelope": "mail-outline",
+  "envelope": "mail",
   "phone.fill": "phone",
-  "phone": "phone-outlined",
+  "phone": "phone",
   "message.fill": "chat",
-  "message": "chat-bubble-outline",
+  "message": "chat",
   "bell.fill": "notifications",
   "bell": "notifications-none",
   "heart.fill": "favorite",
@@ -69,7 +59,7 @@ const MAPPING = {
 
   // Media & Content
   "photo.fill": "image",
-  "photo": "image-outlined",
+  "photo": "image",
   "camera.fill": "camera-alt",
   "camera": "camera-alt",
   "video.fill": "videocam",
@@ -86,9 +76,9 @@ const MAPPING = {
   "gearshape.fill": "settings",
   "slider.horizontal.3": "tune",
   "info.circle.fill": "info",
-  "info.circle": "info-outlined",
+  "info.circle": "info",
   "exclamationmark.triangle.fill": "warning",
-  "exclamationmark.triangle": "warning-amber",
+  "exclamationmark.triangle": "warning",
   "questionmark.circle.fill": "help",
   "questionmark.circle": "help-outline",
 
@@ -108,12 +98,12 @@ const MAPPING = {
   "antenna.radiowaves.left.and.right": "signal-cellular-alt",
   "battery.100": "battery-full",
   "battery.25": "battery-2-bar",
-  "lock.fill": "lock",
+  "lock.fill": "lock", // Keep this one
   "lock.open.fill": "lock-open",
 
   // Shopping & Commerce
   "cart.fill": "shopping-cart",
-  "cart": "shopping-cart-outlined",
+  "cart": "shopping-cart",
   "creditcard.fill": "credit-card",
   "creditcard": "credit-card",
   "dollarsign.circle.fill": "monetization-on",
@@ -141,6 +131,12 @@ const MAPPING = {
   "person.crop.circle.fill": "account-circle",
   "person.crop.circle": "account-circle",
 
+  // Additional icons for your ResidentDashboard
+  "list.bullet": "format-list-bulleted",
+  "phone.circle": "call",
+  "megaphone": "volume-up",
+  "person.circle": "account-circle",
+
   // Sharing & Export
   "square.and.arrow.up": "share",
   "square.and.arrow.down": "download",
@@ -158,38 +154,37 @@ const MAPPING = {
   "lightbulb.fill": "lightbulb",
   "moon.fill": "dark-mode",
   "sun.max.fill": "light-mode",
-} as Partial<
-  Record<
-    import("expo-symbols").SymbolViewProps["name"],
-    React.ComponentProps<typeof MaterialIcons>["name"]
-  >
->;
+
+  // Verification icons
+  "checkmark.seal.fill": "verified",
+  "rectangle.portrait.and.arrow.right": "logout",
+  // REMOVED DUPLICATE: "lock.fill": "lock", // This was the duplicate
+  "arrow.down.circle": "download",
+};
 
 export type IconSymbolName = keyof typeof MAPPING;
 
-/**
- * An icon component that uses native SFSymbols on iOS, and MaterialIcons on Android and web. This ensures a consistent look across platforms, and optimal resource usage.
- *
- * Icon `name`s are based on SFSymbols and require manual mapping to MaterialIcons.
- */
+interface IconSymbolProps {
+  name: IconSymbolName;
+  size?: number;
+  color: string | OpaqueColorValue;
+  style?: StyleProp<TextStyle>;
+}
+
 export function IconSymbol({
   name,
   size = 24,
   color,
   style,
-}: {
-  name: IconSymbolName;
-  size?: number;
-  color: string | OpaqueColorValue;
-  style?: StyleProp<ViewStyle>;
-  weight?: SymbolWeight;
-}) {
+}: IconSymbolProps) {
+  const materialIconName = MAPPING[name] || "help";
+  
   return (
     <MaterialIcons
-      color={color}
+      name={materialIconName}
       size={size}
-      name={MAPPING[name]}
-      style={style as StyleProp<TextStyle>}
+      color={color}
+      style={style}
     />
   );
 }

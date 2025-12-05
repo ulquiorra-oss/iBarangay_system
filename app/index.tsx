@@ -1,34 +1,34 @@
+import { View, Text, Pressable, StyleSheet, Image } from "react-native";
+import { router } from "expo-router";
 
-import React, { useEffect } from 'react';
-import { Redirect } from 'expo-router';
-import { useAuth } from '../contexts/AuthContext';
-import { View, ActivityIndicator } from 'react-native';
-import { barangayColors } from '../constants/Colors';
+export default function Home() {
+  return (
+    <View style={styles.container}>
+      <Image
+        source={require("../assets/images/logo.png")}
+        style={styles.logo}
+      />
+      <Text style={styles.title}>Welcome to iBarangay</Text>
 
-export default function RootIndex() {
-  const { user, isLoading } = useAuth();
-
-  console.log('RootIndex - User:', user?.firstName, 'Role:', user?.role, 'Loading:', isLoading);
-
-  if (isLoading) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: barangayColors.background }}>
-        <ActivityIndicator size="large" color={barangayColors.primary} />
-      </View>
-    );
-  }
-
-  if (!user) {
-    return <Redirect href="/(auth)/welcome" />;
-  }
-
-  if (user.role === 'resident') {
-    return <Redirect href="/(resident)/dashboard" />;
-  }
-
-  if (user.role === 'admin') {
-    return <Redirect href="/(admin)/dashboard" />;
-  }
-
-  return <Redirect href="/(auth)/welcome" />;
+      <Pressable
+        style={styles.button}
+        onPress={() => router.push("/(auth)/welcome")}
+      >
+        <Text style={styles.buttonText}>Continue</Text>
+      </Pressable>
+    </View>
+  );
 }
+
+const styles = StyleSheet.create({
+  container: { flex: 1, justifyContent: "center", alignItems: "center" },
+  logo: { width: 120, height: 120, marginBottom: 20 },
+  title: { fontSize: 26, fontWeight: "bold", marginBottom: 20 },
+  button: {
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    backgroundColor: "#007AFF",
+    borderRadius: 8,
+  },
+  buttonText: { color: "#fff", fontSize: 16 },
+});

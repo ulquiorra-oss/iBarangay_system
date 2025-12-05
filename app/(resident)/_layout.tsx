@@ -1,26 +1,102 @@
-
-import React from 'react';
-import { Stack } from 'expo-router';
+import React, { useEffect } from 'react';
+import { Stack, router } from 'expo-router';
 import { useAuth } from '../../contexts/AuthContext';
-import { Redirect } from 'expo-router';
 
 export default function ResidentLayout() {
   const { user } = useAuth();
 
+  useEffect(() => {
+    if (!user || user.role !== 'resident') {
+      router.replace('/(auth)/welcome');
+    }
+  }, [user]);
+
+  // Don't render anything if not authenticated
   if (!user || user.role !== 'resident') {
-    return <Redirect href="/(auth)/welcome" />;
+    return null;
   }
 
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="dashboard" />
-      <Stack.Screen name="documents" />
-      <Stack.Screen name="payments" />
-      <Stack.Screen name="requests" />
-      <Stack.Screen name="announcements" />
-      <Stack.Screen name="directory" />
-      <Stack.Screen name="profile" />
-      <Stack.Screen name="emergency" />
+    <Stack>
+      {/* Dashboard */}
+      <Stack.Screen
+        name="dashboard"
+        options={{
+          headerShown: false,
+        }}
+      />
+
+      {/* My Documents - ADD THIS */}
+      <Stack.Screen
+        name="mydocuments"
+        options={{
+          headerShown: false,
+        }}
+      />
+
+      {/* Documents */}
+      <Stack.Screen
+        name="documents"
+        options={{
+          headerShown: false,
+        }}
+      />
+
+      {/* Payments */}
+      <Stack.Screen
+        name="payments"
+        options={{
+          headerShown: false,
+        }}
+      />
+
+      {/* Requests */}
+      <Stack.Screen
+        name="requests"
+        options={{
+          headerShown: false,
+        }}
+      />
+
+      {/* Announcements */}
+      <Stack.Screen
+        name="announcements"
+        options={{
+          headerShown: false,
+        }}
+      />
+
+      {/* Directory */}
+      <Stack.Screen
+        name="directory"
+        options={{
+          headerShown: false,
+        }}
+      />
+
+      {/* Profile */}
+      <Stack.Screen
+        name="profile"
+        options={{
+          headerShown: false,
+        }}
+      />
+
+      {/* Emergency */}
+      <Stack.Screen
+        name="emergency"
+        options={{
+          headerShown: false,
+        }}
+      />
+
+      {/* Settings */}
+      <Stack.Screen
+        name="settings"
+        options={{
+          headerShown: false,
+        }}
+      />
     </Stack>
   );
 }

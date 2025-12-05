@@ -1,4 +1,3 @@
-
 export interface User {
   id: string;
   email: string;
@@ -8,7 +7,7 @@ export interface User {
   barangayId: string;
   phoneNumber?: string;
   address?: string;
-  profileImage?: string;
+  profileImage?: any;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -34,13 +33,21 @@ export interface HouseholdMember {
   occupation?: string;
 }
 
-export type AdminPermission = 
+export type AdminPermission =
   | 'manage_documents'
   | 'manage_payments'
   | 'manage_residents'
   | 'manage_announcements'
   | 'manage_directory'
   | 'generate_reports';
+
+// ONLY ONE PaymentMethodData interface - make sure this is the one with 'method' property
+export interface PaymentMethodData {
+  method: PaymentMethod;
+  referenceNumber?: string;
+  proofImage?: string;
+  paymentDate: Date;
+}
 
 export interface DocumentRequest {
   id: string;
@@ -54,13 +61,17 @@ export interface DocumentRequest {
   paymentStatus: PaymentStatus;
   paymentAmount: number;
   paymentMethod?: PaymentMethod;
+  paymentData?: PaymentMethodData;
   paymentProof?: string;
   referenceNumber: string;
   notes?: string;
   documentUrl?: string;
+  updatedAt?: Date;
+  completedDate?: Date;
+  fee?: number;
 }
 
-export type DocumentType = 
+export type DocumentType =
   | 'barangay_clearance'
   | 'certificate_of_residency'
   | 'certificate_of_indigency'
@@ -68,7 +79,7 @@ export type DocumentType =
   | 'cedula'
   | 'barangay_id';
 
-export type DocumentStatus = 
+export type DocumentStatus =
   | 'pending'
   | 'payment_needed'
   | 'processing'
@@ -76,19 +87,20 @@ export type DocumentStatus =
   | 'completed'
   | 'rejected';
 
-export type PaymentStatus = 
+export type PaymentStatus =
   | 'unpaid'
   | 'pending_verification'
   | 'verified'
   | 'rejected';
 
-export type PaymentMethod = 
+export type PaymentMethod =
   | 'gcash'
   | 'paymaya'
   | 'bank_transfer'
   | 'cash'
   | 'over_the_counter';
 
+// This should be called 'Payment' not 'PaymentMethodData'
 export interface Payment {
   id: string;
   documentRequestId: string;
@@ -118,7 +130,7 @@ export interface Announcement {
   targetAudience: 'all' | 'residents' | 'officials';
 }
 
-export type AnnouncementType = 
+export type AnnouncementType =
   | 'general'
   | 'event'
   | 'emergency'
@@ -135,6 +147,7 @@ export interface DirectoryEntry {
   email?: string;
   address?: string;
   description?: string;
+  profileImage?: any;
   isEmergency: boolean;
   isActive: boolean;
   mapUrl?: string;
@@ -142,7 +155,7 @@ export interface DirectoryEntry {
   operatingHours?: string;
 }
 
-export type DirectoryCategory = 
+export type DirectoryCategory =
   | 'barangay_officials'
   | 'emergency_services'
   | 'government_agencies'
@@ -162,17 +175,14 @@ export interface Report {
   id: string;
   type: ReportType;
   title: string;
-  dateRange: {
-    start: Date;
-    end: Date;
-  };
+  dateRange: { start: Date; end: Date };
   generatedBy: string;
   generatedDate: Date;
   data: any;
   fileUrl?: string;
 }
 
-export type ReportType = 
+export type ReportType =
   | 'document_requests'
   | 'payments'
   | 'residents'
@@ -192,12 +202,15 @@ export interface NotificationSettings {
 export interface AppSettings {
   barangayName: string;
   barangayLogo?: string;
-  contactInfo: {
-    address: string;
-    phoneNumber: string;
-    email: string;
-  };
+  contactInfo: { address: string; phoneNumber: string; email: string };
   operatingHours: string;
-  documentFees: Record<DocumentType, number>;
+  documentFees: {
+    barangay_clearance: number;
+    certificate_of_residency: number;
+    certificate_of_indigency: number;
+    business_permit: number;
+    cedula: number;
+    barangay_id: number;
+  };
   paymentMethods: PaymentMethod[];
 }

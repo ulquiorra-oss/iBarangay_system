@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -37,8 +36,9 @@ const styles = StyleSheet.create({
     left: 20,
     top: 50,
     padding: 8,
+    zIndex: 1, // Added for better clickability
   },
-  content: {
+  contentContainer: { // Renamed from 'content' to avoid conflict
     flex: 1,
   },
   announcementCard: {
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
     color: barangayColors.white,
     textTransform: 'uppercase',
   },
-  content: {
+  announcementContent: { // Renamed from 'content' to avoid conflict
     fontSize: 14,
     color: barangayColors.text,
     lineHeight: 20,
@@ -223,17 +223,17 @@ export default function AnnouncementsScreen() {
   const getTypeIcon = (type: string) => {
     switch (type) {
       case 'general':
-        return 'info';
+        return 'info'; // or 'info.circle.fill' for SF Symbols
       case 'event':
-        return 'event';
+        return 'event'; // or 'calendar.circle.fill'
       case 'emergency':
-        return 'warning';
+        return 'warning'; // or 'exclamationmark.triangle.fill'
       case 'maintenance':
-        return 'build';
+        return 'build'; // or 'wrench.and.screwdriver.fill'
       case 'health':
-        return 'local-hospital';
+        return 'local-hospital'; // or 'heart.circle.fill'
       case 'safety':
-        return 'security';
+        return 'security'; // or 'shield.checkerboard'
       default:
         return 'info';
     }
@@ -258,8 +258,9 @@ export default function AnnouncementsScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
+        {/* Changed from "arrow-back" to "chevron.left" to match other screens */}
         <Pressable style={styles.backButton} onPress={() => router.back()}>
-          <IconSymbol name="arrow-back" size={24} color={barangayColors.white} />
+          <IconSymbol name="chevron.left" size={24} color={barangayColors.white} />
         </Pressable>
         <Text style={styles.headerTitle}>Announcements</Text>
       </View>
@@ -287,13 +288,14 @@ export default function AnnouncementsScreen() {
       </View>
 
       <ScrollView
-        style={{ flex: 1 }}
+        style={styles.contentContainer}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
         {filteredAnnouncements.length === 0 ? (
           <View style={styles.emptyState}>
+            {/* Optional: Update to SF Symbols style if needed */}
             <IconSymbol name="campaign" size={64} color={barangayColors.textLight} />
             <Text style={styles.emptyText}>
               {activeFilter === 'all' ? 'No announcements available' : `No ${activeFilter} announcements`}
@@ -312,7 +314,7 @@ export default function AnnouncementsScreen() {
                 </View>
               </View>
 
-              <Text style={styles.content}>{announcement.content}</Text>
+              <Text style={styles.announcementContent}>{announcement.content}</Text>
 
               <View style={styles.announcementFooter}>
                 <View style={styles.authorInfo}>
